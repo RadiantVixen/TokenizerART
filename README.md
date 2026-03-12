@@ -21,4 +21,4 @@ The NFT was minted with a metadata JSON file stored on IPFS and a corresponding 
 ## 📁 Project Structure
 
 
-https://ipfs.io/ipfs/bafkreiamw45essujvcgxsvqqic5opxngviirmxdhd26xgep23ujqc673hm
+https://ipfs.io/ipfs/bafkreiamw45essujvcgxsvqqic5opxngviirmxdhd26xgep23ujqc673hmg
