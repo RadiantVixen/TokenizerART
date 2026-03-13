@@ -8,7 +8,6 @@ contract Monkey42NFT is ERC721URIStorage, Ownable {
     uint256 public tokenIdCounter;
 
     constructor() ERC721("Monkey42 Explorer", "M42") {
-        // The deployer is automatically the owner (Ownable constructor)
     }
 
     function mintNFT(address recipient, string memory tokenURI)
