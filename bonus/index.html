@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monkey42NFT — Mint On-Chain NFT</title>
+<style>
+    body {
+        background: #0f0f0f;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    h1 { color: #42d742; }
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        background: #1f1f1f;
+        border: 1px solid #333;
+        color: white;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #42d742;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+        color: black;
+        font-weight: bold;
+    }
+    button:hover { background: #32a832; }
+    .box { border: 1px solid #333; padding: 20px; margin-top: 20px; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.min.js"></script>
+</head>
+
+<body>
+
+<h1>Monkey42 NFT — On-Chain Mint</h1>
+
+<button onclick="connectWallet()">🔌 Connect Wallet</button>
+<p id="walletAddress"></p>
+
+<div class="box">
+    <h2>Mint New NFT</h2>
+    <input id="recipient" placeholder="Recipient Address">
+    <input id="nftName" placeholder="NFT Name (must include 42)">
+    <textarea id="description" placeholder="NFT Description"></textarea>
+    <textarea id="base64Image" placeholder="Base64 Image (PNG/SVG)"></textarea>
+    <button onclick="mintNFT()">MINT NFT</button>
+    <p id="mintStatus"></p>
+</div>
+
+<div class="box">
+    <h2>Read tokenURI</h2>
+    <input id="uriTokenId" placeholder="Token ID">
+    <button onclick="getTokenURI()">Get Metadata</button>
+    <textarea id="uriOutput"></textarea>
+</div>
+
+<div class="box">
+    <h2>Check Ownership</h2>
+    <input id="ownerTokenId" placeholder="Token ID">
+    <button onclick="getOwner()">Check Owner</button>
+    <p id="ownerOutput"></p>
+</div>
+
+<div class="box">
+    <h2>Total NFTs Minted</h2>
+    <button onclick="getCounter()">Get tokenIdCounter()</button>
+    <p id="counterOutput"></p>
+</div>
+
+<script>
+
+// ------------------------------------------
+// REPLACE WITH YOUR CONTRACT INFO
+// ------------------------------------------
+const CONTRACT_ADDRESS = "0x1C52cF9Be0A82f06F5481F839FC67362A5Aa1D6F";
+
+const CONTRACT_ABI = [
+    {
+        "inputs":[
+            {"internalType":"address","name":"recipient","type":"address"},
+            {"internalType":"string","name":"name","type":"string"},
+            {"internalType":"string","name":"description","type":"string"},
+            {"internalType":"string","name":"base64Image","type":"string"}
+        ],
+        "name":"mintNFT",
+        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
+        "stateMutability":"nonpayable","type":"function"
+    },
+    {
+        "inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],
+        "name":"ownerOf",
+        "outputs":[{"internalType":"address","name":"","type":"address"}],
+        "stateMutability":"view","type":"function"
+    },
+    {
+        "inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],
+        "name":"tokenURI",
+        "outputs":[{"internalType":"string","name":"","type":"string"}],
+        "stateMutability":"view","type":"function"
+    },
+    {
+        "inputs":[],"name":"tokenIdCounter",
+        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
+        "stateMutability":"view","type":"function"
+    }
+];
+
+// GLOBALS
+let provider;
+let signer;
+let contract;
+
+
+// ------------------------------------------
+// CONNECT WALLET
+// ------------------------------------------
+async function connectWallet() {
+    if (typeof window.ethereum === "undefined") {
+        alert("MetaMask is required.");
+        return;
+    }
+
+    provider = new ethers.BrowserProvider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = await provider.getSigner();
+
+    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+    document.getElementById("walletAddress").innerText =
+        "Connected: " + await signer.getAddress();
+}
+
+
+// ------------------------------------------
+// MINT NFT
+// ------------------------------------------
+async function mintNFT() {
+    try {
+        const recipient = document.getElementById("recipient").value;
+        const name = document.getElementById("nftName").value;
+        const description = document.getElementById("description").value;
+        const base64Image = document.getElementById("base64Image").value;
+
+        const tx = await contract.mintNFT(recipient, name, description, base64Image);
+        document.getElementById("mintStatus").innerText = "Transaction sent...";
+
+        await tx.wait();
+        document.getElementById("mintStatus").innerText = "NFT Minted Successfully!";
+    }
+    catch (err) {
+        console.error(err);
+        alert("Error: " + err.message);
+    }
+}
+
+
+// ------------------------------------------
+// GET TOKEN URI
+// ------------------------------------------
+async function getTokenURI() {
+    try {
+        const id = document.getElementById("uriTokenId").value;
+        const uri = await contract.tokenURI(id);
+        document.getElementById("uriOutput").value = uri;
+    }
+    catch (err) {
+        alert(err.message);
+    }
+}
+
+
+// ------------------------------------------
+// GET OWNER OF TOKEN
+// ------------------------------------------
+async function getOwner() {
+    try {
+        const id = document.getElementById("ownerTokenId").value;
+        const owner = await contract.ownerOf(id);
+
+        document.getElementById("ownerOutput").innerText = "Owner: " + owner;
+    }
+    catch (err) {
+        alert(err.message);
+    }
+}
+
+
+// ------------------------------------------
+// GET TOTAL MINTED
+// ------------------------------------------
+async function getCounter() {
+    try {
+        const count = await contract.tokenIdCounter();
+        document.getElementById("counterOutput").innerText = 
+            "Total NFTs Minted: " + count;
+    }
+    catch (err) {
+        alert(err.message);
+    }
+}
+
+</script>
+</body>
+</html>

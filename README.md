@@ -1,24 +1,42 @@
-# Monkey42 Explorer NFT
+# Monkey42NFT
 
-This project contains the smart contract, metadata, and deployment setup for the **Monkey42 Explorer NFT** deployed on the Sepolia testnet.  
-The NFT was minted with a metadata JSON file stored on IPFS and a corresponding image also on IPFS.
+Monkey42NFT is a non-fungible token (NFT) project created as part of the TokenizeArt challenge.  
+This NFT represents a unique digital asset stored on the blockchain, featuring the number **42** in its design.
 
-**Contract Address (Sepolia):**  
-`0xA755aFd7ca935FeB90047fEbcA96499ACB32cF9C` :contentReference[oaicite:1]{index=1}
+## Objectives
+- Learn blockchain fundamentals and NFT standards.
+- Create and deploy a unique NFT.
+- Manage NFT metadata securely.
+- Demonstrate smart contract functionality and ownership verification.
 
----
+## Tools & Languages Used
+- **Solidity** – programming language for Ethereum smart contracts.
+- **OpenZeppelin ERC721** – secure, standard implementation of NFTs.
+- **Remix IDE** – easy compilation and deployment in a browser environment.
+- **MetaMask** – wallet for deploying and interacting with NFTs.
+- **IPFS** – decentralized storage for NFT images and metadata.
 
-## 🧠 Overview
+**Why we chose these tools:**  
+These tools provide a secure, standard-compliant, and beginner-friendly environment to build and deploy NFTs while focusing on learning blockchain concepts without handling real funds.
 
-- **Name:** Monkey42 Explorer  
-- **Symbol:** M42  
-- **Chain:** Ethereum Sepolia Testnet  
-- **Storage:** Metadata and image hosted on IPFS
-- **Minted via:** Custom ERC-721 smart contract
+## Deployment
+1. Open `Monkey42NFT.sol` in [Remix](https://remix.ethereum.org).
+2. Compile using Solidity `^0.8.17`.
+3. Deploy to a testnet (e.g., sepolia) using MetaMask.
+4. Copy the contract address and verify it on [Etherscan](https://goerli.etherscan.io).
 
----
+## How Users Can Interact
+- **Mint NFT:** Call `mintNFT(address to)` to create a new token.  
+- **Check Ownership:** Use `ownerOf(tokenId)` to confirm who owns a token.  
+- **Track Supply:** Call `tokenCounter()` to see total minted NFTs.  
 
-## 📁 Project Structure
+All interactions can be done directly on Etherscan if the contract is verified.
 
+## Metadata Requirements
+- Artist name: your login (e.g., `aichaatki`)
+- NFT name: must include **42** and a title of your choice
+- Image stored on **IPFS**.
 
-https://ipfs.io/ipfs/bafkreiamw45essujvcgxsvqqic5opxngviirmxdhd26xgep23ujqc673hmg
+## Deployment Info
+- Contract Address: `0xYourContractAddress`
+- Network: sepolia Testnet
