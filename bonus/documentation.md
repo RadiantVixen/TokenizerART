@@ -10,8 +10,8 @@ The contract stores both **metadata and the NFT image fully on-chain** using Bas
 Monkey42NFTOnChain is an ERC-721 compliant smart contract.  
 It allows the owner of the contract to mint NFTs with:
 
-- On-chain JSON metadata  
-- On-chain Base64 encoded image  
+- On-chain JSON metadata
+- On-chain Base64 encoded image
 - Human-readable fields (name, description, creator)
 
 Users can then read metadata, verify ownership, and interact with the token through standard ERC-721 functions.
@@ -23,4 +23,7 @@ Users can then read metadata, verify ownership, and interact with the token thro
 ### **mintNFT**
 Creates a new NFT and stores its metadata + image directly on-chain.
 
-0x1C52cF9Be0A82f06F5481F839FC67362A5Aa1D6F
+0x114a59E9861B6ef16C4f5F04553f7f032E98bfB2
+or
+python3 -m http.server 3000
+http://localhost:3000/bonus/index.html
