@@ -1,0 +1,13 @@
+{
+  "name": "Monkey42 Explorer",
+  "description": "A unique NFT featuring a monkey adventurer with the mysterious number 42.",
+  "image": "https://ipfs.io/ipfs/bafkreiamw45essujvcgxsvqqic5opxngviirmxdhd26xgep23ujqc673hm",
+  "attributes": [
+    { "trait_type": "Species","value": "Monkey" },
+    { "trait_type": "Accessory","value": "Explorer Hat & Cigar" },
+    { "trait_type": "Number","value": 42 },
+    { "trait_type": "Environment","value": "Ancient Cave" },
+    { "trait_type": "Mood","value": "Adventurous" }
+  ],
+  "creator": "aatki"
+}
