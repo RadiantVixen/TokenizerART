@@ -3,44 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <title>Monkey42NFT — Mint On-Chain NFT</title>
+
 <style>
-    body {
-        background: #0f0f0f;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        padding: 20px;
-    }
-    h1 { color: #42d742; }
-    input, textarea {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        background: #1f1f1f;
-        border: 1px solid #333;
-        color: white;
-    }
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #42d742;
-        border: none;
-        cursor: pointer;
-        margin-top: 10px;
-        color: black;
-        font-weight: bold;
-    }
-    button:hover { background: #32a832; }
-    .box { border: 1px solid #333; padding: 20px; margin-top: 20px; }
+body {
+    background: #0f0f0f;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+h1 { color: #42d742; }
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background: #1f1f1f;
+    border: 1px solid #333;
+    color: white;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background: #42d742;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    color: black;
+    font-weight: bold;
+}
+button:hover { background: #32a832; }
+.box { border: 1px solid #333; padding: 20px; margin-top: 20px; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.min.js"></script>
+
+<!-- ✅ ethers v5 (IMPORTANT) -->
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
 </head>
 
 <body>
 
 <h1>Monkey42 NFT — On-Chain Mint</h1>
 
-<button onclick="connectWallet()">🔌 Connect Wallet</button>
-<p id="walletAddress"></p>
+<button id="connectBtn">🔌 Connect Wallet</button>
+<p id="walletAddress">Not connected</p>
 
 <div class="box">
     <h2>Mint New NFT</h2>
@@ -48,34 +52,34 @@
     <input id="nftName" placeholder="NFT Name (must include 42)">
     <textarea id="description" placeholder="NFT Description"></textarea>
     <textarea id="base64Image" placeholder="Base64 Image (PNG/SVG)"></textarea>
-    <button onclick="mintNFT()">MINT NFT</button>
+    <button id="mintBtn">MINT NFT</button>
     <p id="mintStatus"></p>
 </div>
 
 <div class="box">
     <h2>Read tokenURI</h2>
     <input id="uriTokenId" placeholder="Token ID">
-    <button onclick="getTokenURI()">Get Metadata</button>
+    <button id="uriBtn">Get Metadata</button>
     <textarea id="uriOutput"></textarea>
 </div>
 
 <div class="box">
     <h2>Check Ownership</h2>
     <input id="ownerTokenId" placeholder="Token ID">
-    <button onclick="getOwner()">Check Owner</button>
+    <button id="ownerBtn">Check Owner</button>
     <p id="ownerOutput"></p>
 </div>
 
 <div class="box">
     <h2>Total NFTs Minted</h2>
-    <button onclick="getCounter()">Get tokenIdCounter()</button>
+    <button id="counterBtn">Get tokenIdCounter()</button>
     <p id="counterOutput"></p>
 </div>
 
 <script>
 
 // ------------------------------------------
-// REPLACE WITH YOUR CONTRACT INFO
+// CONTRACT CONFIG
 // ------------------------------------------
 const CONTRACT_ADDRESS = "0x1C52cF9Be0A82f06F5481F839FC67362A5Aa1D6F";
 
@@ -110,36 +114,68 @@ const CONTRACT_ABI = [
     }
 ];
 
+// ------------------------------------------
 // GLOBALS
-let provider;
-let signer;
-let contract;
+// ------------------------------------------
+let provider, signer, contract;
 
+// ------------------------------------------
+// HELPERS
+// ------------------------------------------
+function setStatus(msg) {
+    document.getElementById("walletAddress").innerText = msg;
+}
+
+function requireWallet() {
+    if (!contract) {
+        setStatus("Connect wallet first!");
+        return false;
+    }
+    return true;
+}
 
 // ------------------------------------------
 // CONNECT WALLET
 // ------------------------------------------
 async function connectWallet() {
-    if (typeof window.ethereum === "undefined") {
-        alert("MetaMask is required.");
+    if (!window.ethereum) {
+        alert("MetaMask not found!");
         return;
     }
 
-    provider = new ethers.BrowserProvider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    signer = await provider.getSigner();
+    try {
+        const SEPOLIA_CHAIN_ID = "0xaa36a7";
 
-    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        const chainId = await window.ethereum.request({ method: "eth_chainId" });
 
-    document.getElementById("walletAddress").innerText =
-        "Connected: " + await signer.getAddress();
+        if (chainId !== SEPOLIA_CHAIN_ID) {
+            await window.ethereum.request({
+                method: "wallet_switchEthereumChain",
+                params: [{ chainId: SEPOLIA_CHAIN_ID }],
+            });
+        }
+
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+
+        signer = provider.getSigner();
+        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+        const address = await signer.getAddress();
+        setStatus("Connected: " + address);
+
+    } catch (err) {
+        console.error(err);
+        setStatus("Connection failed: " + err.message);
+    }
 }
-
 
 // ------------------------------------------
 // MINT NFT
 // ------------------------------------------
 async function mintNFT() {
+    if (!requireWallet()) return;
+
     try {
         const recipient = document.getElementById("recipient").value;
         const name = document.getElementById("nftName").value;
@@ -147,63 +183,72 @@ async function mintNFT() {
         const base64Image = document.getElementById("base64Image").value;
 
         const tx = await contract.mintNFT(recipient, name, description, base64Image);
-        document.getElementById("mintStatus").innerText = "Transaction sent...";
 
+        document.getElementById("mintStatus").innerText = "Transaction sent...";
         await tx.wait();
-        document.getElementById("mintStatus").innerText = "NFT Minted Successfully!";
-    }
-    catch (err) {
+
+        document.getElementById("mintStatus").innerText = "NFT Minted ✅";
+
+    } catch (err) {
         console.error(err);
-        alert("Error: " + err.message);
+        alert(err.message);
     }
 }
-
 
 // ------------------------------------------
 // GET TOKEN URI
 // ------------------------------------------
 async function getTokenURI() {
+    if (!requireWallet()) return;
+
     try {
         const id = document.getElementById("uriTokenId").value;
         const uri = await contract.tokenURI(id);
         document.getElementById("uriOutput").value = uri;
-    }
-    catch (err) {
+    } catch (err) {
         alert(err.message);
     }
 }
 
-
 // ------------------------------------------
-// GET OWNER OF TOKEN
+// GET OWNER
 // ------------------------------------------
 async function getOwner() {
+    if (!requireWallet()) return;
+
     try {
         const id = document.getElementById("ownerTokenId").value;
         const owner = await contract.ownerOf(id);
-
-        document.getElementById("ownerOutput").innerText = "Owner: " + owner;
-    }
-    catch (err) {
+        document.getElementById("ownerOutput").innerText = owner;
+    } catch (err) {
         alert(err.message);
     }
 }
 
-
 // ------------------------------------------
-// GET TOTAL MINTED
+// GET COUNTER
 // ------------------------------------------
 async function getCounter() {
+    if (!requireWallet()) return;
+
     try {
         const count = await contract.tokenIdCounter();
-        document.getElementById("counterOutput").innerText = 
-            "Total NFTs Minted: " + count;
-    }
-    catch (err) {
+        document.getElementById("counterOutput").innerText = count;
+    } catch (err) {
         alert(err.message);
     }
 }
 
+// ------------------------------------------
+// EVENTS (cleaner than onclick)
+// ------------------------------------------
+document.getElementById("connectBtn").onclick = connectWallet;
+document.getElementById("mintBtn").onclick = mintNFT;
+document.getElementById("uriBtn").onclick = getTokenURI;
+document.getElementById("ownerBtn").onclick = getOwner;
+document.getElementById("counterBtn").onclick = getCounter;
+
 </script>
+
 </body>
 </html>

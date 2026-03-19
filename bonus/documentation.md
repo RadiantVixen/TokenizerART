@@ -27,3 +27,4 @@ Creates a new NFT and stores its metadata + image directly on-chain.
 or
 python3 -m http.server 3000
 http://localhost:3000/bonus/index.html
+https://sepolia.etherscan.io/address/0xa1fE531a07Fb29dE9ce3E1e4dc427a1Bb208e33f#writeContract
