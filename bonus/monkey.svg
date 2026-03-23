@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+  <rect width="100%" height="100%" fill="black"></rect>
+  <circle cx="250" cy="220" r="120" fill="#6b4423"></circle>
+  <circle cx="200" cy="180" r="25" fill="white"></circle>
+  <circle cx="300" cy="180" r="25" fill="white"></circle>
+  <circle cx="200" cy="180" r="10" fill="black"></circle>
+  <circle cx="300" cy="180" r="10" fill="black"></circle>
+  <text x="250" y="420" font-size="48" text-anchor="middle" fill="gold">Monkey 42</text>
+</svg>

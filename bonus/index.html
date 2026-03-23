@@ -81,36 +81,41 @@ button:hover { background: #32a832; }
 // ------------------------------------------
 // CONTRACT CONFIG
 // ------------------------------------------
-const CONTRACT_ADDRESS = "0x1C52cF9Be0A82f06F5481F839FC67362A5Aa1D6F";
+const CONTRACT_ADDRESS = "0x3dA4B2De0C41FD930851d3E36d67C2FdB8EEccE7";
 
 const CONTRACT_ABI = [
     {
-        "inputs":[
-            {"internalType":"address","name":"recipient","type":"address"},
-            {"internalType":"string","name":"name","type":"string"},
-            {"internalType":"string","name":"description","type":"string"},
-            {"internalType":"string","name":"base64Image","type":"string"}
+        "inputs": [
+            {"internalType": "address", "name": "recipient", "type": "address"},
+            {"internalType": "string", "name": "name_", "type": "string"},
+            {"internalType": "string", "name": "description_", "type": "string"},
+            {"internalType": "string", "name": "svg_", "type": "string"}
         ],
-        "name":"mintNFT",
-        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
-        "stateMutability":"nonpayable","type":"function"
+        "name": "mintNFT",
+        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],
-        "name":"ownerOf",
-        "outputs":[{"internalType":"address","name":"","type":"address"}],
-        "stateMutability":"view","type":"function"
+        "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+        "name": "ownerOf",
+        "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],
-        "name":"tokenURI",
-        "outputs":[{"internalType":"string","name":"","type":"string"}],
-        "stateMutability":"view","type":"function"
+        "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+        "name": "tokenURI",
+        "outputs": [{"internalType": "string", "name": "", "type": "string"}],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "inputs":[],"name":"tokenIdCounter",
-        "outputs":[{"internalType":"uint256","name":"","type":"uint256"}],
-        "stateMutability":"view","type":"function"
+        "inputs": [],
+        "name": "tokenIdCounter",
+        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "stateMutability": "view",
+        "type": "function"
     }
 ];
 
@@ -138,6 +143,11 @@ function requireWallet() {
 // CONNECT WALLET
 // ------------------------------------------
 async function connectWallet() {
+    if (typeof ethers === "undefined") {
+        setStatus("Ethers library not loaded.");
+        return;
+    }
+
     if (!window.ethereum) {
         alert("MetaMask not found!");
         return;
@@ -166,7 +176,8 @@ async function connectWallet() {
 
     } catch (err) {
         console.error(err);
-        setStatus("Connection failed: " + err.message);
+        const errorMessage = err && err.message ? err.message : String(err);
+        setStatus("Connection failed: " + errorMessage);
     }
 }
 
