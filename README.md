@@ -38,5 +38,8 @@ All interactions can be done directly on Etherscan if the contract is verified.
 - Image stored on **IPFS**.
 
 ## Deployment Info
-- Contract Address: `0xYourContractAddress`
+- Contract Address: `0x54664E19A7CEe0567830B73825F769b07fc840cE`
 - Network: sepolia Testnet
+
+
+https://sepolia.etherscan.io/address/0x54664E19A7CEe0567830B73825F769b07fc840cE#readContract

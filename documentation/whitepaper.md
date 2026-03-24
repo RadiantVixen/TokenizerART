@@ -70,7 +70,7 @@ By combining Solidity, OpenZeppelin, Remix, and IPFS, this project ensures **sec
 
 ---
 
-**Project Author:** aichaatki  
+**Project Author:** aichaatki
 **NFT Title Example:** Monkey42 – “The Curious Collector”  
 **Network:** Goerli Testnet  
-**Contract Address:** `0xYourContractAddress`
+**Contract Address:** `0x54664E19A7CEe0567830B73825F769b07fc840cE`

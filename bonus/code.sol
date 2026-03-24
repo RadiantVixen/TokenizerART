@@ -1,76 +1,65 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.3/contracts/token/ERC721/ERC721.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.3/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts@4.9.3/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts@4.9.3/access/Ownable.sol";
+import "@openzeppelin/contracts@4.9.3/utils/Base64.sol";
 
-contract Monkey42NFTOnChain is ERC721, Ownable {
+contract Monkey42Custom is ERC721, Ownable {
     uint256 public tokenIdCounter;
-    mapping(uint256 => string) private _metadata;
+
+    struct NFTData {
+        string name;
+        string description;
+        string svg;
+    }
+
+    mapping(uint256 => NFTData) private nftData;
 
     constructor() ERC721("Monkey42 Explorer", "M42") {}
 
     function mintNFT(
         address recipient,
-        string memory name,
-        string memory description,
-        string memory base64Image
+        string memory name_,
+        string memory description_,
+        string memory svg_
     ) public onlyOwner returns (uint256) {
-
-        string memory json = string(
-            abi.encodePacked(
-                '{"name":"',name,
-                '","description":"',description,
-                '","image":"data:image/png;base64,',base64Image,
-                '","creator":"aatki"}'
-            )
-        );
-
         uint256 newId = tokenIdCounter;
         _safeMint(recipient, newId);
-        _metadata[newId] = json;
-        tokenIdCounter++;
 
+        nftData[newId] = NFTData({
+            name: name_,
+            description: description_,
+            svg: svg_
+        });
+
+        tokenIdCounter++;
         return newId;
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "Token does not exist");
 
+        string memory imageURI = string(
+            abi.encodePacked(
+                "data:image/svg+xml;base64,",
+                Base64.encode(bytes(nftData[tokenId].svg))
+            )
+        );
+
+        string memory json = string(
+            abi.encodePacked(
+                '{"name":"', nftData[tokenId].name,
+                '","description":"', nftData[tokenId].description,
+                '","image":"', imageURI, '"}'
+            )
+        );
+
         return string(
             abi.encodePacked(
                 "data:application/json;base64,",
-                _base64(bytes(_metadata[tokenId]))
+                Base64.encode(bytes(json))
             )
         );
-    }
-
-    function _base64(bytes memory data) internal pure returns (string memory) {
-        string memory TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        uint256 encodedLen = 4 * ((data.length + 2) / 3);
-
-        bytes memory result = new bytes(encodedLen);
-        uint256 i = 0;
-        uint256 j = 0;
-
-        while (i < data.length) {
-            uint256 a = uint8(data[i++]);
-            uint256 b = i < data.length ? uint8(data[i++]) : 0;
-            uint256 c = i < data.length ? uint8(data[i++]) : 0;
-
-            uint256 triple = (a << 16) | (b << 8) | c;
-
-            result[j++] = bytes(TABLE)[(triple >> 18) & 0x3F];
-            result[j++] = bytes(TABLE)[(triple >> 12) & 0x3F];
-            result[j++] = i - 1 < data.length
-                ? bytes(TABLE)[(triple >> 6) & 0x3F]
-                : bytes1("=");
-
-            result[j++] = i < data.length
-                ? bytes(TABLE)[triple & 0x3F]
-                : bytes1("=");
-        }
-
-        return string(result);
     }
 }
